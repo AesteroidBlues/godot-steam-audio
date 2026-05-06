@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import os
+import subprocess
+import sys
 
 godot_cpp_path = "src/lib/godot-cpp"
 steam_audio_path = "src/lib/steamaudio"
@@ -19,6 +21,14 @@ if not (os.path.isdir(steam_audio_lib_path) and os.listdir(steam_audio_lib_path)
     Exit(1)
 
 env.Append(CPPPATH=["src/"])
+
+if sys.platform == "darwin":
+    try:
+        sdk_path = subprocess.check_output(["xcrun", "--show-sdk-path"], text=True).strip()
+        if sdk_path:
+            env.Append(CPPPATH=[sdk_path + "/usr/include/c++/v1"])
+    except Exception:
+        pass
 
 if env.get("CC", "").lower() == "cl":
     # Building with MSVC
